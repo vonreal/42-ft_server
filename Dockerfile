@@ -1,9 +1,9 @@
-# SET BASE IMAGE
+# [SET BASE IMAGE]
 FROM	debian:buster
 
 LABEL	"webserver"="jna"
 
-# DOWNLOAD MIDDLEWERE AND SERVICES
+# [DOWNLOAD MIDDLEWERE AND ETC]
 RUN		apt-get update && apt-get -y install \
 		nginx \
 		openssl \
@@ -13,13 +13,15 @@ RUN		apt-get update && apt-get -y install \
 		wget \
 		vim
 
-# Nginx DEFAULT FILE COPY
+# [FILE COPY AMD PASTE]
 COPY	./srcs/default ./etc/nginx/sites-available/default
 
-# SSL CA CREATE
+# [SSL PROTOCAL]
+#	[CA CERTFICATE CREATE]
 RUN		openssl req -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=KR/ST=Seoul/L=Seoul/O=42Seoul/CN=jna" -keyout /etc/ssl/private/localhost.dev.key -out /etc/ssl/certs/localhost.dev.crt
 
-# wordpress DOWNLOAD
+# [DOWNLOAD]
+#	download of wordpress
 RUN		wget https://wordpress.org/latest.tar.gz && \
 		tar -xvf /latest.tar.gz && \
 		mv /wordpress/ /var/www/html/ && \
@@ -27,7 +29,7 @@ RUN		wget https://wordpress.org/latest.tar.gz && \
 
 COPY	./srcs/wp-config.php ./var/www/html/wordpress/
 
-# phpmyadmin DOWNLOAD
+#	download of phpMyAdmin
 RUN 	wget https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-languages.tar.gz && \
 		tar -xvf phpMyAdmin-5.0.2-all-languages.tar.gz && \
 		mv phpMyAdmin-5.0.2-all-languages phpmyadmin && \
@@ -35,10 +37,10 @@ RUN 	wget https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-lan
 
 COPY	./srcs/config.inc.php ./var/www/html/phpmyadmin/
 
-# SET PORT
+# [SET PORT]
 EXPOSE	80 443
 
-# DB RUN
+# [COMMAND RUN ON CONTAINER]
 CMD		service mysql start; \
 		service php7.3-fpm start; \
 		echo "CREATE DATABASE IF NOT EXISTS wordpress;" | mysql -u root --skip-password; \
